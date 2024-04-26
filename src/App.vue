@@ -2,25 +2,26 @@
 
   <div class="main">
     <section class="allOfMonths">
-      <h3>Monate vom Jahr : {{ currentYear }}</h3>
-      <div class="">
-        <p v-for="(month, index) in months" :key="index">
-        {{ month[0] }}
-      </p>
-      </div>
-      
+      <MonthCalender @monthOnClick="getMonthName($event)" :currentYear="currentYear" :months="months">
+      </MonthCalender>
     </section>
+   
+    
     <section class="daysInMonth">
-      <p>hier kommen Monatstage</p>
+      <DaysCalender :currentYear="currentYear" :months="months" :monthName="m"></DaysCalender>
     </section>
     <section class="toDo">
-      <p>hier kommen Todoliste</p>
+      <ToDoList></ToDoList>
     </section>
   </div>
 </template>
 
 
 <script setup lang="ts">
+import MonthCalender from './components/MonthCalender.vue'
+import DaysCalender from './components/DaysCalender.vue'
+import ToDoList from './components/ToDoList.vue'
+
 import {ref} from 'vue'
 
 // eine List von den Monaten und die Anzahl der Monatstage 
@@ -29,14 +30,28 @@ const months = ref<Array<string|number>[]>([]);
 const currentYear = new Date().getFullYear();
 //console.log(currentYear)
 
+
 // Monate hinzufügen
 for (let i = 0; i < 12; i++) {
   const monthName = new Date(currentYear, i, 1).toLocaleString('default', { month: 'long' });
   const daysInMonth = new Date(currentYear, i + 1, 0).getDate();
+  //console.log(daysInMonth)
   months.value.push([monthName,daysInMonth]);
   }
 
-
+  const m=ref<string>('')
+function getMonthName(event:string){
+   console.log('hl: '+event)
+    return event=m.value
+}
+const date = new Date(); // Get the current date
+//console.log(`das ist komplett: ${date}`)
+const dayName = date.getDay(); // Get the day of the week as an integer
+console.log(`das ist Dayname: ${dayName}`)
+// Convert the day of the week integer to a day name
+const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const day = dayNames[6];
+console.log(`das ist: ${day}`)
 </script>
 
 <style scoped>
@@ -47,6 +62,8 @@ html{
 .main{
   display: flex;
 }
+
+
 .main section{
   border: 0.5px solid #e0e0e0;
   border-radius: 10px;
@@ -58,25 +75,6 @@ html{
   flex-grow: 2;
   max-width: 21%;
 }
-.allOfMonths div {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  
-}
-
-.allOfMonths div p {
-  font-size: large;
-  width: 80px;
-  height: 40px; 
-  margin: 1px;
-  text-align: center;
-  line-height: 40px;
-  border-radius: 5px;
-  background: #eeeded;  
-}
-
 .daysInMonth{
   flex-grow: 5;
   max-width: 40%;
