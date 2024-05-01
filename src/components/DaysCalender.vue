@@ -1,10 +1,10 @@
 <template>
     <div>
         <section class="currentDate">
-            <p >{{ props.currentYear }}-{{ props.monthName }}</p>
+            <p >{{ props.currentYear }}-{{ monthName }}</p>
         </section>
-        <section class="table">
-            <table>
+        <section class="table" v-for="(month,index) in props.months" :key="index" >
+            <table v-if="monthName==month.monthName">
                 <tr>
                     <th>Samstag</th>
                     <th>Sonnstag</th>
@@ -14,9 +14,20 @@
                     <th>Donnerstag</th>
                     <th>Freitag</th>
                 </tr>
+                <tr >
+                    <td v-for="(count,index) in 7" :key="index">{{ count  }}</td>
+                </tr>
                 <tr>
-                    <td></td>
-                    
+                    <td v-for="(count,index) in 7" :key="index +7">{{ count +7 }}</td>
+                </tr>
+                <tr>
+                    <td v-for="(count,index) in 7" :key="index +14">{{ count +14 }}</td>
+                </tr>
+                <tr>
+                    <td v-for="(count,index) in 7" :key="index +21">{{ count  +21}}</td>
+                </tr>
+                <tr>
+                    <td v-for="(count,index) in month.countOfDay-28 " :key="index+28">{{ count +28 }}</td>
                 </tr>
             </table>
         </section>
@@ -25,13 +36,17 @@
 </template>
 
 <script setup lang="ts">
-import{defineProps, PropType} from 'vue'
+import{watch,ref,defineProps, PropType} from 'vue'
+import {monthAndDay} from '../types/interfaces'
 
 const props=defineProps({
     currentYear : {type:Number, required:true},
-    months:{type: Array as PropType<Array<Array<string|number>>>, required:true},
-        monthName:{type:String, required:true}
+    months:{type: Array as PropType<monthAndDay[]>, required:true},
+    monthName:{type:String, required:true}
 })
+
+
+
 
 
 </script>

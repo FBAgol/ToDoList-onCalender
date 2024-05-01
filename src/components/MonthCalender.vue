@@ -1,25 +1,25 @@
 <template>
       <h3>Monate vom Jahr : {{ props.currentYear }}</h3>
       <div class="">
-        <p ref="monthName" v-for="(month, index) in props.months" :key="index" @click="clickOnMonth">
-        {{ month[0] }}
+        <p ref="monthName" v-for="(month, index) in props.months" :key="index" @click="sendMonthname">
+        {{ month.monthName }}
       </p>
       </div>
 </template>
 
 <script setup lang="ts">
 import { ref,defineProps, PropType, defineEmits} from 'vue'
-
+import {monthAndDay} from '../types/interfaces'
 
 const props= defineProps({
-    months: { type: Array as  PropType<Array<Array<string | number>>>, required: true },
+    months: { type: Array as  PropType<monthAndDay[]>, required: true },
     currentYear: { type: Number, required: true },
     
 })
 
 const emits=defineEmits(['monthOnClick'])
 const monthName=ref<string>('')
-  function clickOnMonth(event: MouseEvent) {
+  function sendMonthname(event: MouseEvent) {
   // Den Inhalt des geklickten <p>-Tags abrufen
   const clickedParagraph = event.target as HTMLParagraphElement;
   monthName.value = clickedParagraph.textContent || '';

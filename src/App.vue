@@ -8,7 +8,7 @@
    
     
     <section class="daysInMonth">
-      <DaysCalender :currentYear="currentYear" :months="months" :monthName="m"></DaysCalender>
+      <DaysCalender :currentYear="currentYear" :months="months" :monthName="clickedMonthName"></DaysCalender>
     </section>
     <section class="toDo">
       <ToDoList></ToDoList>
@@ -21,11 +21,14 @@
 import MonthCalender from './components/MonthCalender.vue'
 import DaysCalender from './components/DaysCalender.vue'
 import ToDoList from './components/ToDoList.vue'
+import {monthAndDay} from './types/interfaces'
 
-import {ref} from 'vue'
+import {computed, ref} from 'vue'
+
+
 
 // eine List von den Monaten und die Anzahl der Monatstage 
-const months = ref<Array<string|number>[]>([]);
+const months = ref<monthAndDay[]>([]);
 // Aktuelles Jahr bekommen
 const currentYear = new Date().getFullYear();
 //console.log(currentYear)
@@ -34,31 +37,48 @@ const currentYear = new Date().getFullYear();
 // Monate hinzufügen
 for (let i = 0; i < 12; i++) {
   const monthName = new Date(currentYear, i, 1).toLocaleString('default', { month: 'long' });
+ // console.log(typeof monthName)
   const daysInMonth = new Date(currentYear, i + 1, 0).getDate();
-  //console.log(daysInMonth)
-  months.value.push([monthName,daysInMonth]);
+  // console.log(typeof daysInMonth)
+  months.value.push({monthName:monthName, countOfDay:daysInMonth});
   }
 
-  const m=ref<string>('')
+  //console.log(months)
+
+const clickedMonthName=ref<string>('Janur')
 function getMonthName(event:string){
-   console.log('hl: '+event)
-    return event=m.value
+   clickedMonthName.value=event
+    return clickedMonthName.value
 }
-const date = new Date(); // Get the current date
-//console.log(`das ist komplett: ${date}`)
-const dayName = date.getDay(); // Get the day of the week as an integer
-console.log(`das ist Dayname: ${dayName}`)
-// Convert the day of the week integer to a day name
-const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const day = dayNames[6];
-console.log(`das ist: ${day}`)
+
+const allOfMonth= ['Janur','Februar','März','Apri','Mai','juni','Juli','August','September','Oktober','November','Dezember']
+
+
+
+
+
+
+// in Date(year, month, day) --> alle müssen Zahlen sein --> dann können wir sehen was ist der erste Tag jedes Monates  
+
+function startOfMonth(date:Date)
+  {
+    let startOfMonthDate = new Date(date.getFullYear(), 0, 1);
+    allOfMonth.forEach(month=>{
+   if(month==clickedMonthName.value){
+    startOfMonthDate = new Date(date.getFullYear(), allOfMonth.indexOf(month), 1);
+  }
+})
+    
+    return startOfMonthDate;
+}
+
+const dt =new Date(); 
+console.log(startOfMonth(dt).toString());
 </script>
 
 <style scoped>
 
-html{
-  background-color: #e0e0e0;
-}
+
 .main{
   display: flex;
 }
