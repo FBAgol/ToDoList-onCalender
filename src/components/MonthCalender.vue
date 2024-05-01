@@ -20,7 +20,7 @@ const props= defineProps({
 const emits=defineEmits(['monthOnClick'])
 const monthName=ref<string>('')
   function sendMonthname(event: MouseEvent) {
-  // Den Inhalt des geklickten <p>-Tags abrufen
+  // call the contant of the clicked monthName
   const clickedParagraph = event.target as HTMLParagraphElement;
   monthName.value = clickedParagraph.textContent || '';
   //console.log(monthName.value)

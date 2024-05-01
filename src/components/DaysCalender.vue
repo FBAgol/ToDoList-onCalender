@@ -6,13 +6,7 @@
         <section class="table" v-for="(month,index) in props.months" :key="index" >
             <table v-if="monthName==month.monthName">
                 <tr>
-                    <th>Samstag</th>
-                    <th>Sonnstag</th>
-                    <th>Montag</th>
-                    <th>Dienstag</th>
-                    <th>Mittwoch</th>
-                    <th>Donnerstag</th>
-                    <th>Freitag</th>
+                    <th v-for="(day, index) in Object.keys(weekDays)" :key="index">{{ day }}</th>
                 </tr>
                 <tr >
                     <td v-for="(count,index) in 7" :key="index">{{ count  }}</td>
@@ -36,19 +30,26 @@
 </template>
 
 <script setup lang="ts">
-import{watch,ref,defineProps, PropType} from 'vue'
+import{defineProps, PropType} from 'vue'
 import {monthAndDay} from '../types/interfaces'
 
 const props=defineProps({
     currentYear : {type:Number, required:true},
     months:{type: Array as PropType<monthAndDay[]>, required:true},
-    monthName:{type:String, required:true}
+    monthName:{type:String, required:true},
+    startOfMonth:{type:String, required:true}
 })
 
-
-
-
-
+const weekDays={
+    
+    Montag:"Mon",
+    Dienstag:"Tue",
+    Mittwoch:"Wed",
+    Donnerstag:"Thu",
+    Freitag:"Fri",
+    Samstag:"Sat",
+    Sonntag:"Sun"
+}
 </script>
 
 <style scoped>
