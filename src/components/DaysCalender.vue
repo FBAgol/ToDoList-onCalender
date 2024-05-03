@@ -6,13 +6,15 @@
         <section class="table" v-for="(month,index) in props.months" :key="index" >
             <table v-if="monthName==month.monthName">
                 <tr>
-                    <th v-for="(day, index) in Object.keys(weekDays)" :key="index">{{ day }}</th>
-                </tr>
-                <tr >
-                    <td v-for="(count,index) in 7" :key="index">{{ count  }}</td>
+                    <th v-for="(day, index) in weekDays" :key="index">{{ day }}</th>
                 </tr>
                 <tr>
-                    <td v-for="(count,index) in 7" :key="index +7">{{ count +7 }}</td>
+                    <td class="emptyBox" v-for="(count) in props.indexNumber" :key="count">{{ }}</td>
+                    <td v-for="(count) in 7-props.indexNumber" :key="count">{{ count }}</td>
+                </tr>
+               
+                <tr>
+                    <td v-for="(count,index) in 7" :key="index +7">{{ count +7-props.indexNumber }}</td>
                 </tr>
                 <tr>
                     <td v-for="(count,index) in 7" :key="index +14">{{ count +14 }}</td>
@@ -30,26 +32,19 @@
 </template>
 
 <script setup lang="ts">
-import{defineProps, PropType} from 'vue'
+import{defineProps, PropType,computed,ref} from 'vue'
 import {monthAndDay} from '../types/interfaces'
 
 const props=defineProps({
     currentYear : {type:Number, required:true},
     months:{type: Array as PropType<monthAndDay[]>, required:true},
     monthName:{type:String, required:true},
-    startOfMonth:{type:String, required:true}
+    startOfMonth:{type:String, required:true},
+    indexNumber:{type:Number, required:true}
 })
 
-const weekDays={
-    
-    Montag:"Mon",
-    Dienstag:"Tue",
-    Mittwoch:"Wed",
-    Donnerstag:"Thu",
-    Freitag:"Fri",
-    Samstag:"Sat",
-    Sonntag:"Sun"
-}
+const weekDays=["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
+
 </script>
 
 <style scoped>
@@ -57,13 +52,17 @@ const weekDays={
     border-bottom: 1px solid black;
     text-align: center;
     line-height: 40%;
-
-
+}
+table:first-child{
+    margin: 20px;
 }
 table th{
     border: 1px solid black;
-    height: 50px;
-    width: 70px;
+    height: 80px;
+    width: 103px;
+    border-radius: 10px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    background-color: #fff;
 }
 
 table td{
@@ -72,5 +71,10 @@ table td{
     height: 60px;
     text-align: center;
     line-height: 40%;
+    cursor: pointer;
+}
+
+.emptyBox{
+    background-color: aqua;
 }
 </style>

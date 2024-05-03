@@ -2,12 +2,12 @@
 
   <div class="main">
     <section class="allOfMonths">
-      <MonthCalender @monthOnClick="getMonthName($event)" :currentYear="currentYear" :months="months">
+      <MonthCalender @monthOnClick="getMonthName($event),indexFirstMonthDay($event) " :currentYear="currentYear" :months="months">
       </MonthCalender>
     </section>
   
     <section class="daysInMonth">
-      <DaysCalender :currentYear="currentYear" :months="months" :startOfMonth="startOfMonth" :monthName="clickedMonthName"></DaysCalender>
+      <DaysCalender :currentYear="currentYear" :months="months" :startOfMonth="startOfMonth" :monthName="clickedMonthName" :indexNumber="indexNumber"></DaysCalender>
     </section>
 
     <section class="toDo">
@@ -23,7 +23,7 @@ import DaysCalender from './components/DaysCalender.vue'
 import ToDoList from './components/ToDoList.vue'
 import {monthAndDay} from './types/interfaces'
 
-import {ref} from 'vue'
+import {ref,onMounted, watch} from 'vue'
 
 
 
@@ -33,8 +33,14 @@ const months = ref<monthAndDay[]>([]);
 const currentYear = new Date().getFullYear();
 //console.log(currentYear)
 
+const clickedMonthName=ref<string>('Janur')
+const startOfMonth=ref<string>("")
+const indexNumber=ref<number>(-1)
+const allOfMonth= ['Janur','Februar','März','Apri','Mai','Juni','Juli','August','September','Oktober','November','Dezember']
 
-// add dict of the monathname and the count of its wohl days to the months variable
+
+onMounted(()=>{
+  // add dict of the monathname and the count of its wohl days to the months variable
 for (let i = 0; i < 12; i++) {
   const monthName = new Date(currentYear, i, 1).toLocaleString('default', { month: 'long' });
  // console.log(typeof monthName)
@@ -43,26 +49,33 @@ for (let i = 0; i < 12; i++) {
   months.value.push({monthName:monthName, countOfDay:daysInMonth});
   }
 
-  //console.log(months)
 
-const allOfMonth= ['Janur','Februar','März','Apri','Mai','Juni','Juli','August','September','Oktober','November','Dezember']
-const clickedMonthName=ref<string>('Janur')
-const startOfMonth=ref<string>("")
+})
+
+console.log(months)
+
 
 function getMonthName(event:string){
   // get the clicked monthname 
    clickedMonthName.value=event
-   // get the name of the first day of the clicked month
-   let startOfMonthDate = new Date(currentYear, 0, 1); 
-    allOfMonth.forEach(month=>{
-   if(month==clickedMonthName.value){
-    startOfMonthDate = new Date(currentYear, allOfMonth.indexOf(month), 1);
-  }
-})  
-  startOfMonth.value=startOfMonthDate.toString().slice(0,4)
+   return clickedMonthName.value
 }
 
+function indexFirstMonthDay(event:string){
+  // get the first Monthdayname in a string 
+  let startOfMonthDate = new Date(currentYear, 0, 1); 
+    allOfMonth.forEach(month=>{
+   if(month==event){
+    startOfMonthDate = new Date(currentYear, allOfMonth.indexOf(month), 1);
+    
+  }
+})  
+console.log(startOfMonthDate.toString().slice(0,4))  
+  // get indexNumber of the first Monthday
+  indexNumber.value = (startOfMonthDate.getDay()+6)%7 // Sunday index= 0 
+    //console.log(indexNumber.value);
 
+}
 </script>
 
 <style scoped>
