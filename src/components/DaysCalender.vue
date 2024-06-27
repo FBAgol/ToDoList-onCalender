@@ -1,20 +1,20 @@
 <template>
     <div>
         <section class="currentDate">
-            <p >{{ props.currentYear }}-{{ monthName }}</p>
+            <p >{{ currentYear}}-{{ monthName }}</p>
         </section>
         <section class="table" v-for="(month,index) in props.months" :key="index" >
             <table v-if="monthName==month.monthName">
                 <tr>
-                    <th v-for="(day, index) in weekDays" :key="index">{{ day }}</th>
+                    <th ref="dayNumber" v-for="(day, index) in weekDays" :key="index">{{ day }}</th>
                 </tr>
                 <tr>
-                    <td class="emptyBox" v-for="(count) in props.indexNumber" :key="count">{{ }}</td>
-                    <td v-for="(count) in 7-props.indexNumber" :key="count">{{ count }}</td>
+                    <td class="emptyBox" v-for="(count) in indexNumber" :key="count" >{{ }}</td>
+                    <td v-for="(count) in 7-indexNumber" :key="count" @click="getDayNumber(count)">{{ count }}</td>
                 </tr>
                
                 <tr>
-                    <td v-for="(count,index) in 7" :key="index +7">{{ count +7-props.indexNumber }}</td>
+                    <td v-for="(count,index) in 7" :key="index +7">{{ count +7-indexNumber }}</td>
                 </tr>
                 <tr>
                     <td v-for="(count,index) in 7" :key="index +14">{{ count +14 }}</td>
@@ -32,18 +32,29 @@
 </template>
 
 <script setup lang="ts">
-import{defineProps, PropType,computed,ref} from 'vue'
+import{defineProps, PropType,defineEmits} from 'vue'
 import {monthAndDay} from '../types/interfaces'
+import { mainStore } from '@/store/index'
+import { storeToRefs } from 'pinia'
+
+const store = mainStore()
+const { currentYear, indexNumber } = storeToRefs(store)
 
 const props=defineProps({
-    currentYear : {type:Number, required:true},
     months:{type: Array as PropType<monthAndDay[]>, required:true},
     monthName:{type:String, required:true},
     startOfMonth:{type:String, required:true},
-    indexNumber:{type:Number, required:true}
 })
 
 const weekDays=["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
+
+const emits= defineEmits(["clickedDay"])
+
+
+function getDayNumber(day:number){
+    return emits("clickedDay",day )
+}
+
 
 </script>
 

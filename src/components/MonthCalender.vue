@@ -1,5 +1,5 @@
 <template>
-      <h3>Monate vom Jahr : {{ props.currentYear }}</h3>
+      <h3>Monate vom Jahr : {{ currentYear }}</h3>
       <div class="">
         <p ref="monthName" v-for="(month, index) in props.months" :key="index" @click="sendMonthname">
         {{ month.monthName }}
@@ -10,10 +10,14 @@
 <script setup lang="ts">
 import { ref,defineProps, PropType, defineEmits} from 'vue'
 import {monthAndDay} from '../types/interfaces'
+import { mainStore } from '@/store/index'
+import { storeToRefs } from 'pinia'
+
+const store = mainStore()
+const { currentYear } = storeToRefs(store)
 
 const props= defineProps({
     months: { type: Array as  PropType<monthAndDay[]>, required: true },
-    currentYear: { type: Number, required: true },
     
 })
 

@@ -2,16 +2,18 @@
 
   <div class="main">
     <section class="allOfMonths">
-      <MonthCalender @monthOnClick="getMonthName($event),indexFirstMonthDay($event) " :currentYear="currentYear" :months="months">
+      <MonthCalender @monthOnClick="store.getMonthName($event), store.indexFirstMonthDay($event)"
+        :currentYear="currentYear" :months="months">
       </MonthCalender>
     </section>
-  
+
     <section class="daysInMonth">
-      <DaysCalender :currentYear="currentYear" :months="months" :startOfMonth="startOfMonth" :monthName="clickedMonthName" :indexNumber="indexNumber"></DaysCalender>
+      <DaysCalender :currentYear="currentYear" :months="months" :startOfMonth="startOfMonth"
+        :monthName="clickedMonthName" :indexNumber="indexNumber"></DaysCalender>
     </section>
 
     <section class="toDo">
-      <ToDoList></ToDoList>
+      <ToDoList :currentYear="currentYear" :monthName="clickedMonthName"></ToDoList>
     </section>
   </div>
 </template>
@@ -21,83 +23,54 @@
 import MonthCalender from './components/MonthCalender.vue'
 import DaysCalender from './components/DaysCalender.vue'
 import ToDoList from './components/ToDoList.vue'
-import {monthAndDay} from './types/interfaces'
+import { monthAndDay } from '@/types/interfaces'
+import { mainStore } from '@/store/index'
+import { ref, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 
-import {ref,onMounted, watch} from 'vue'
-
-
-
+const store = mainStore()
+const { currentYear, clickedMonthName, startOfMonth, indexNumber } = storeToRefs(store)
 // list of dicts of the monathname and the count of its wohl days
 const months = ref<monthAndDay[]>([]);
-// current year
-const currentYear = new Date().getFullYear();
-//console.log(currentYear)
 
-const clickedMonthName=ref<string>('Janur')
-const startOfMonth=ref<string>("")
-const indexNumber=ref<number>(-1)
-const allOfMonth= ['Janur','Februar','März','Apri','Mai','Juni','Juli','August','September','Oktober','November','Dezember']
-
-
-onMounted(()=>{
+onMounted(() => {
   // add dict of the monathname and the count of its wohl days to the months variable
-for (let i = 0; i < 12; i++) {
-  const monthName = new Date(currentYear, i, 1).toLocaleString('default', { month: 'long' });
- // console.log(typeof monthName)
-  const daysInMonth = new Date(currentYear, i + 1, 0).getDate();
-  // console.log(typeof daysInMonth)
-  months.value.push({monthName:monthName, countOfDay:daysInMonth});
+  for (let i = 0; i < 12; i++) {
+    const monthName = new Date(currentYear.value, i, 1).toLocaleString('default', { month: 'long' });
+    // console.log(typeof monthName)
+    const daysInMonth = new Date(currentYear.value, i + 1, 0).getDate();
+    // console.log(typeof daysInMonth)
+    months.value.push({ monthName: monthName, countOfDay: daysInMonth });
   }
-
-
 })
 
-console.log(months)
 
-
-function getMonthName(event:string){
-  // get the clicked monthname 
-   clickedMonthName.value=event
-   return clickedMonthName.value
-}
-
-function indexFirstMonthDay(event:string){
-  // get the first Monthdayname in a string 
-  let startOfMonthDate = new Date(currentYear, 0, 1); 
-    allOfMonth.forEach(month=>{
-   if(month==event){
-    startOfMonthDate = new Date(currentYear, allOfMonth.indexOf(month), 1);
-    
-  }
-})  
-console.log(startOfMonthDate.toString().slice(0,4))  
-  // get indexNumber of the first Monthday
-  indexNumber.value = (startOfMonthDate.getDay()+6)%7 // Sunday index= 0 
-    //console.log(indexNumber.value);
-
-}
 </script>
 
 <style scoped>
-.main{
+.main {
   display: flex;
 }
-.main section{
+
+.main section {
   border: 0.5px solid #e0e0e0;
   border-radius: 10px;
   margin: 1px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   background-color: #fff;
 }
-.allOfMonths{
+
+.allOfMonths {
   flex-grow: 2;
   max-width: 21%;
 }
-.daysInMonth{
+
+.daysInMonth {
   flex-grow: 5;
   max-width: 40%;
 }
-.toDo{
+
+.toDo {
   flex-grow: 3;
   max-width: 39%;
 }
