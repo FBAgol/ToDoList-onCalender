@@ -7,6 +7,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'home',
     component: HomeView
   } */
+
 ]
 
 const router = createRouter({

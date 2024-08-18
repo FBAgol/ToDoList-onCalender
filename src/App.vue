@@ -1,6 +1,10 @@
 <template>
-
-  <div class="main">
+  <div :class="calenderContent ? 'hidden' : 'show'">
+    <LaningPage @tok="getToken($event)"></LaningPage>
+  </div>
+  
+  <div :class="calenderContent ? 'show' :'hidden'">
+    <div class="main">
     <section class="allOfMonths">
       <MonthCalender @monthOnClick="store.getMonthName($event), store.indexFirstMonthDay($event)"
         :currentYear="currentYear" :months="months">
@@ -16,24 +20,40 @@
       <ToDoList :currentYear="currentYear" :monthName="clickedMonthName"></ToDoList>
     </section>
   </div>
+
+</div>
+
+ 
 </template>
 
 
 <script setup lang="ts">
-import MonthCalender from './components/MonthCalender.vue'
-import DaysCalender from './components/DaysCalender.vue'
-import ToDoList from './components/ToDoList.vue'
+import MonthCalender from './components/month/MonthCalender.vue'
+import DaysCalender from './components/month/DaysCalender.vue'
+import ToDoList from './components/month/ToDoList.vue'
+import LaningPage from './components/LandingPage.vue'
 import { monthAndDay } from '@/types/interfaces'
 import { mainStore } from '@/store/index'
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import AOS from 'aos'
 
+
+
+
+const calenderContent=ref(false)
+
+function getToken(e:string){
+  if(e) {
+    calenderContent.value=true  
+  }
+}
 const store = mainStore()
 const { currentYear, clickedMonthName, startOfMonth, indexNumber } = storeToRefs(store)
 // list of dicts of the monathname and the count of its wohl days
 const months = ref<monthAndDay[]>([]);
 
-onMounted(() => {
+const monthInfo= (()=>{
   // add dict of the monathname and the count of its wohl days to the months variable
   for (let i = 0; i < 12; i++) {
     const monthName = new Date(currentYear.value, i, 1).toLocaleString('default', { month: 'long' });
@@ -42,8 +62,14 @@ onMounted(() => {
     // console.log(typeof daysInMonth)
     months.value.push({ monthName: monthName, countOfDay: daysInMonth });
   }
+
 })
 
+onMounted(async()=>{
+  monthInfo(), 
+  AOS.init()
+
+})
 
 </script>
 
@@ -73,5 +99,11 @@ onMounted(() => {
 .toDo {
   flex-grow: 3;
   max-width: 39%;
+}
+.hidden{
+  display: none
+}
+.show {
+  visibility: visible;
 }
 </style>

@@ -9,8 +9,8 @@
 
 <script setup lang="ts">
 import { ref,defineProps, PropType, defineEmits} from 'vue'
-import {monthAndDay} from '../types/interfaces'
-import { mainStore } from '@/store/index'
+import {monthAndDay} from '../../types/interfaces'
+import { mainStore } from '../../store/index'
 import { storeToRefs } from 'pinia'
 
 const store = mainStore()
