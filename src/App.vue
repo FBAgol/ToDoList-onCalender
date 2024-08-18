@@ -2,9 +2,7 @@
   <div :class="calenderContent ? 'hidden' : 'show'">
     <LaningPage @tok="getToken($event)"></LaningPage>
   </div>
-  
-  <div :class="calenderContent ? 'show' :'hidden'">
-    <div class="main">
+  <div :class="calenderContent ? 'show' :'hidden'" class="main">
     <section class="allOfMonths">
       <MonthCalender @monthOnClick="store.getMonthName($event), store.indexFirstMonthDay($event)"
         :currentYear="currentYear" :months="months">
@@ -21,7 +19,7 @@
     </section>
   </div>
 
-</div>
+
 
  
 </template>
@@ -79,11 +77,16 @@ onMounted(async()=>{
 }
 
 .main section {
-  border: 0.5px solid #e0e0e0;
+  border: 0.5px solid;
   border-radius: 10px;
   margin: 1px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  background-color: #fff;
+  backdrop-filter: blur(15px) saturate(153%);
+    -webkit-backdrop-filter: blur(15px) saturate(153%);
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    border: 1px solid rgba(209, 213, 219, 0.3);
+ 
 }
 
 .allOfMonths {

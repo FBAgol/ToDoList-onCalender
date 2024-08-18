@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import{defineProps, PropType,defineEmits} from 'vue'
-import {monthAndDay} from '../types/interfaces'
+import {monthAndDay} from '../../types/interfaces'
 import { mainStore } from '@/store/index'
 import { storeToRefs } from 'pinia'
 

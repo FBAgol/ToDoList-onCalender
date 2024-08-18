@@ -77,6 +77,8 @@ async function getUserData() {
         console.error("Fetch error 2:", error);
     }
 }
+
+
 </script>
 
 
@@ -90,16 +92,21 @@ body {
 }
 
 .form {
-  background-color: #15172b;
   border-radius: 20px;
   box-sizing: border-box;
   height: 550px;
   padding: 20px;
   width: 320px;
+  backdrop-filter: blur(15px) saturate(153%);
+    -webkit-backdrop-filter: blur(15px) saturate(153%);
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    border: 1px solid rgba(209, 213, 219, 0.3);
+
 }
 
 .title {
-  color: #eee;
+  color: black;
   font-family: sans-serif;
   font-size: 36px;
   font-weight: 600;
@@ -107,7 +114,7 @@ body {
 }
 
 .subtitle {
-  color: #eee;
+  color: black;
   font-family: sans-serif;
   font-size: 16px;
   font-weight: 600;
@@ -129,11 +136,11 @@ body {
 }
 
 .input {
-  background-color: #303245;
+  background-color:  #d4ded6;
   border-radius: 12px;
   border: 0;
   box-sizing: border-box;
-  color: #eee;
+  color: black;
   font-size: 18px;
   height: 100%;
   outline: 0;
@@ -142,7 +149,11 @@ body {
 }
 
 .cut {
-  background-color: #15172b;
+  backdrop-filter: blur(15px) saturate(153%);
+    -webkit-backdrop-filter: blur(15px) saturate(153%);
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    border: 1px solid rgba(209, 213, 219, 0.3);
   border-radius: 10px;
   height: 20px;
   left: 20px;

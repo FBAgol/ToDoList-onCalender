@@ -42,6 +42,7 @@ div {
   flex-wrap: wrap;
   justify-content: center;
   
+  
 }
 
 div p {
@@ -52,7 +53,7 @@ div p {
   text-align: center;
   line-height: 40px;
   border-radius: 5px;
-  background: #eeeded;  
+  background: #bcf7eb;  
 }
 
 div p:hover{
