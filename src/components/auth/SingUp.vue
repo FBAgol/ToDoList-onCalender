@@ -1,45 +1,50 @@
 <template> 
-    <div>
-        <form @submit.prevent="getUserData" class="form">
-      <div class="title">SingUp</div>
-      <div class="subtitle">Let's create your account!</div>
-      <div class="input-container ic1">
-        <input v-model="fname" id="firstname" class="input" type="text" placeholder=" " />
-        <div class="cut"></div>
-        <label for="firstname" class="placeholder">First name</label>
-      </div>
-      <div class="input-container ic2">
-        <input v-model="lastname" id="lastname" class="input" type="text" placeholder=" " />
-        <div class="cut"></div>
-        <label for="lastname" class="placeholder">Last name</label>
-      </div>
-      <div class="input-container ic2">
-        <input v-model="email" id="email" class="input" type="text" placeholder=" " />
-        <div class="cut cut-short"></div>
-        <label for="email" class="placeholder">Email</label>
-      </div>
-      <div class="input-container ic2">
-        <input v-model="password" id="password" class="input" type="text" placeholder=" " />
-        <div class="cut cut-short"></div>
-        <label for="password" class="placeholder">Password</label>
-      </div>
-      <button  class="submit">submit</button>
+  <div>
+      
+      <form @submit.prevent="getUserData" class="form">
+        <div class="title">SingUp</div>
+        <div class="subtitle">Let's create your account!</div>
+        <div class="input-container ic1">
+          <input v-model="fname" id="firstname" class="input" type="text" placeholder=" " />
+          <div class="cut"></div>
+          <label for="firstname" class="placeholder">First name</label>
+        </div>
+        <div class="input-container ic2">
+          <input v-model="lastname" id="lastname" class="input" type="text" placeholder=" " />
+          <div class="cut"></div>
+          <label for="lastname" class="placeholder">Last name</label>
+        </div>
+        <div class="input-container ic2">
+          <input v-model="email" id="email" class="input" type="text" placeholder=" " />
+          <div class="cut cut-short"></div>
+          <label for="email" class="placeholder">Email</label>
+        </div>
+        <div class="input-container ic2">
+          <input v-model="password" id="password" class="input" type="text" placeholder=" " />
+          <div class="cut cut-short"></div>
+          <label for="password" class="placeholder">Password</label>
+        </div>
+        <button  class="submit">submit</button>
     </form>
-    </div>
+   
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, defineEmits } from 'vue';
+import AOS from 'aos'
 
-const emits=defineEmits(["token"])
-// Definiere ref-Variablen für die Eingabefelder
+const emits=defineEmits(["token", "userDupplicate"])
 const fname = ref<string>("");
 const lastname = ref<string>("");
 const email = ref<string>("");
 const password = ref<string>("");
 
-// Funktion zum Verarbeiten der Formulardaten
-async function getUserData() {
+const userDupplicate=ref(false)
+
+
+
+async function getUserData(): Promise<string | void> {
     const user = {
         firstname: fname.value,
         lastname: lastname.value,
@@ -63,39 +68,44 @@ async function getUserData() {
         );
 
         if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Server Error 1: ${errorText}`);
+            const errorText = await response.json();
+            if(errorText.message==="User already exists"){
+              userDupplicate.value=true
+              if(userDupplicate.value){
+                emits("userDupplicate", userDupplicate.value)
+              
+              }
+            }
+            
+            throw new Error(`Server Error 1: ${errorText.message}`);
         }
 
         const result = await response.json();
       
         //console.log(typeof result)
-        return emits("token", result)
+         emits("token", result)
 
 
     } catch (error) {
         console.error("Fetch error 2:", error);
     }
 }
-
+AOS.init({
+    duration: 2800,
+  })
 
 </script>
 
 
 <style scoped>
-body {
-  align-items: center;
-  background-color: #000;
-  display: flex;
-  justify-content: center;
-  height: 100vh;
-}
+
 
 .form {
   border-radius: 20px;
   box-sizing: border-box;
-  height: 550px;
+  height: 530px;
   padding: 20px;
+  margin: 10px 0 10px 0;
   width: 320px;
   backdrop-filter: blur(15px) saturate(153%);
     -webkit-backdrop-filter: blur(15px) saturate(153%);
@@ -149,11 +159,7 @@ body {
 }
 
 .cut {
-  backdrop-filter: blur(15px) saturate(153%);
-    -webkit-backdrop-filter: blur(15px) saturate(153%);
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    border: 1px solid rgba(209, 213, 219, 0.3);
+ 
   border-radius: 10px;
   height: 20px;
   left: 20px;
@@ -171,6 +177,11 @@ body {
 .input:focus ~ .cut,
 .input:not(:placeholder-shown) ~ .cut {
   transform: translateY(8px);
+  backdrop-filter: blur(15px) saturate(153%);
+    -webkit-backdrop-filter: blur(15px) saturate(153%);
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    border: 1px solid rgba(209, 213, 219, 0.3);
 }
 
 .placeholder {
@@ -207,7 +218,7 @@ body {
   cursor: pointer;
   font-size: 18px;
   height: 50px;
-  margin-top: 38px;
+  margin-top: 25px;
   /* outline: 0; */
   text-align: center;
   width: 100%;
@@ -217,4 +228,11 @@ body {
   background-color: #06b;
 }
 
+.show{
+  visibility: visible;
+}
+
+.hidden{
+  display: none;
+}
 </style>

@@ -1,8 +1,15 @@
-body{
+body {
     background-image: linear-gradient(to right top, #758294, #6ba4b8, #65c8c4, #90e7b5, #e0fe9d);
     height: 100%;
     overflow: auto;
+    scrollbar-width: none; /* Versteckt die Scroll-Leiste in Firefox */
 }
+
+/* Versteckt die Scroll-Leiste in Webkit-basierten Browsern */
+::-webkit-scrollbar {
+    display: none;
+}
+
 html {
     overflow: hidden;
     height: 100%;

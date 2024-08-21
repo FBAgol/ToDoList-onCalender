@@ -1,6 +1,6 @@
 <template>
   <div :class="calenderContent ? 'hidden' : 'show'">
-    <LaningPage @tok="getToken($event)"></LaningPage>
+    <LaningPage @tok="getToken($event)" @is-auth="getAuthResult($event)"></LaningPage>
   </div>
   <div :class="calenderContent ? 'show' :'hidden'" class="main">
     <section class="allOfMonths">
@@ -42,6 +42,12 @@ import AOS from 'aos'
 const calenderContent=ref(false)
 
 function getToken(e:string){
+  if(e) {
+    calenderContent.value=true  
+  }
+}
+
+function getAuthResult(e:boolean){
   if(e) {
     calenderContent.value=true  
   }

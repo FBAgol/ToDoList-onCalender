@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from 'vue'
 
-
 export const mainStore = defineStore('store', () => {
   // current year
   const currentYear = ref<number>(new Date().getFullYear());  
