@@ -9,15 +9,8 @@
       <button data-aos="fade-up-left" @click="singUPContent" class="button">Sing Up</button>
     </div>
   </div>
-  <div class="error" :class="userDupplicate ? 'show' : 'hidden'">
-        <span>{{ errorContent }}</span><b class="closeError">&times;</b>
-  </div>
-  <div class="error" :class="!isAuthen ? 'show' : 'hidden'">
-    <span>{{authContent }}</span><b class="closeError">&times;</b>
-  </div>
-
   <div class="auth">
-    <singup @user-dupplicate="getDupplicateError($event)" @token="getToken($event)" :class="singUpActive ? 'show' : 'hidden'">singup</singup> 
+    <singup @token="getToken($event)" :class="singUpActive ? 'show' : 'hidden'">singup</singup> 
     <singin @is-authenticated="getAuthResult($event)" :class="singInActive ? 'show' : 'hidden'">SingIn</singin>
   
   </div>
@@ -37,12 +30,10 @@ onMounted(async () => {
 })
 
 const emits = defineEmits(["tok", "isAuth"])
-const errorContent = ref<string>("User already exists")
+
 const singInActive = ref(false)
 const landingSeite = ref()
-const userDupplicate = ref(false)
 const isAuthen = ref(true)
-const authContent = ref<string>("password or email is wrong")
 
 function singInContent() {
   singInActive.value = true
@@ -76,11 +67,6 @@ function getAuthResult(e: boolean) {
   return emits("isAuth", e)
 }
 
-function getDupplicateError(e: boolean) {
-  if (e) {
-   userDupplicate.value = true
-  }
-}
 </script>
 
 <style scoped>
@@ -135,6 +121,7 @@ p {
 .show {
   visibility: visible;
 }
+
 .auth{
   display: flex;
   justify-content: center;
@@ -146,9 +133,9 @@ p {
   background-color: #f44336;
   color: white;
   padding: 15px;
-  margin-bottom: 20px;
   border-radius: 10px;
   width: 320px;
+  margin-top: 25px
 }
 
 .closeError {

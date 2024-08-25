@@ -1,8 +1,5 @@
 <template> 
     <div>
-        <div class="error" :class="NotFoundUser ? 'show' : 'hidden'">
-          {{ errorContent }}<b>&times;</b>
-        </div>
         <form @submit.prevent="getUserData" class="form">
           <div class="title">SingIn</div>
           <div class="subtitle">Let's create your account!</div>
@@ -17,6 +14,10 @@
             <label for="password" class="placeholder">Password</label>
           </div>
           <button  class="submit">submit</button>
+          <p class="pwForgot">do you forgot password ?</p>
+          <div class="error" :class="NotFoundUser ? 'show' : 'hidden'">
+          {{ errorContent }}<b @click="closeError" class="multiplication">&times;</b>
+        </div>
       </form>
      
     </div>
@@ -26,13 +27,13 @@
   import { ref,defineEmits } from 'vue';
   import AOS from 'aos'
   
+  const dataAos=ref<string |null>("")
   const emits=defineEmits(["isAuthenticated"])
   const email = ref<string>("");
   const password = ref<string>("");
-  const errorContent = ref<string>("User already exists")
+  const errorContent = ref<string>("Password or Email is incorrect")
   const NotFoundUser=ref(false)
   
-  // Funktion zum Verarbeiten der Formulardaten
   async function getUserData(): Promise<string | void> {
       const user = {
           email: email.value,
@@ -54,26 +55,33 @@
               }
           );
   
-          if (!response.ok) {
-              const errorText = await response.json();
-              
-              throw new Error(`Server Error 1: ${errorText.message}`);
-          }
-  
           const result = await response.json();
-        
-          console.log( result)
-          emits("isAuthenticated", result)
+          //result has two atrinbuttes isUser and token
+          //console.log(result)
+          if (!result) {
+              NotFoundUser.value = true;
+              dataAos.value = "fade-up-left";
+              AOS.refresh(); // AOS-Animation aktualisieren
+              
+          } else {
+            emits("isAuthenticated", result.isUser);
+          }
   
   
       } catch (error) {
           console.error("Fetch error 2:", error);
       }
   }
+  function closeError(){
+  NotFoundUser.value=false
+ 
+  }
+  
+
   AOS.init({
       duration: 2800,
     })
-  
+
   </script>
   
   
@@ -83,7 +91,7 @@
   .form {
     border-radius: 20px;
     box-sizing: border-box;
-    height: 530px;
+    height: 520px;
     padding: 20px;
     margin: 10px 0 10px 0;
     width: 320px;
@@ -100,7 +108,7 @@
     font-family: sans-serif;
     font-size: 36px;
     font-weight: 600;
-    margin-top: 30px;
+    margin-top: 22px;
   }
   
   .subtitle {
@@ -110,6 +118,11 @@
     font-weight: 600;
     margin-top: 10px;
   }
+  .pwForgot{
+    font-family: sans-serif;
+    font-size: 16px;
+    text-align: center;
+}
   
   .input-container {
     height: 50px;
@@ -208,19 +221,36 @@
     background-color: #06b;
   }
   
-  .show{
-    visibility: visible;
+ 
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
   }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.show {
+  visibility: visible;
+  opacity: 1;
+  animation: slideInFromLeft 2.3s ease-in-out;
+}
+.hidden {
+  visibility: hidden;
+}
   
-  .hidden{
-    display: none;
+.error {
+  display: flex;
+  justify-content: space-around;
+  background-color: #f44336;
+  color: white;
+  padding: 15px;
+  margin-top: 25px;
+  border-radius: 10px;
+}
+.multiplication{
+    cursor: pointer;
   }
-  
-  .error {
-    background-color: #f44336;
-    color: white;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-  }
-  </style>
+</style>

@@ -1,55 +1,121 @@
 <template> 
   <div>
-      
-      <form @submit.prevent="getUserData" class="form">
-        <div class="title">SingUp</div>
-        <div class="subtitle">Let's create your account!</div>
-        <div class="input-container ic1">
-          <input v-model="fname" id="firstname" class="input" type="text" placeholder=" " />
-          <div class="cut"></div>
-          <label for="firstname" class="placeholder">First name</label>
-        </div>
-        <div class="input-container ic2">
-          <input v-model="lastname" id="lastname" class="input" type="text" placeholder=" " />
-          <div class="cut"></div>
-          <label for="lastname" class="placeholder">Last name</label>
-        </div>
-        <div class="input-container ic2">
-          <input v-model="email" id="email" class="input" type="text" placeholder=" " />
-          <div class="cut cut-short"></div>
-          <label for="email" class="placeholder">Email</label>
-        </div>
-        <div class="input-container ic2">
-          <input v-model="password" id="password" class="input" type="text" placeholder=" " />
-          <div class="cut cut-short"></div>
-          <label for="password" class="placeholder">Password</label>
-        </div>
-        <button  class="submit">submit</button>
+    <div :class="userDupplicate ? 'show error'  : 'hidden'">
+        <span>{{ errorContent }}</span><b @click="closeError" class="multiplication">&times;</b>
+    </div>
+    <form @submit.prevent="getUserData" class="form">
+      <div class="title">SingUp</div>
+      <div class="subtitle">Let's create your account!</div>
+      <div class="input-container ic1">
+        <input v-model="fname" id="firstname" class="input" type="text" placeholder=" " />
+        <div class="cut"></div>
+        <label for="firstname" class="placeholder">First name</label>
+      </div>
+      <p>{{ fnameError }}</p>
+      <div class="input-container ic2">
+        <input v-model="lastname" id="lastname" class="input" type="text" placeholder=" " />
+        <div class="cut"></div>
+        <label for="lastname" class="placeholder">Last name</label>
+      </div>
+      <p>{{ lastnameError }}</p>
+      <div class="input-container ic2">
+        <input v-model="email" id="email" class="input" type="text" placeholder=" " />
+        <div class="cut cut-short"></div>
+        <label for="email" class="placeholder">Email</label>
+      </div>
+      <p>{{ emailError }}</p>
+      <p>{{ emptyEmail }}</p>
+      <div class="input-container ic2">
+        <input v-model="password" id="password" class="input" type="text" placeholder=" " />
+        <div class="cut cut-short"></div>
+        <label for="password" class="placeholder">Password</label>
+      </div>
+      <p>{{ passwordError }}</p>
+      <p>{{ emptyPasssword }}</p>
+      <button  class="submit">submit</button>
     </form>
-   
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits } from 'vue';
+import { ref, defineEmits} from 'vue';
 import AOS from 'aos'
 
 const emits=defineEmits(["token", "userDupplicate"])
 const fname = ref<string>("");
+const fnameError=ref<string>("")
 const lastname = ref<string>("");
+const lastnameError=ref<string>("")
 const email = ref<string>("");
+const emailError = ref<string | null>(null);
+const emptyEmail=ref<string>("")
 const password = ref<string>("");
-
+const passwordError = ref<string | null>(null);
+const emptyPasssword=ref<string>("")
+const errorContent = ref<string>("User already exists. Bitte versuchen Sie mit den anderen Daten");
 const userDupplicate=ref(false)
 
+function validateEmail() {
+  // Regex für die Gmail-Adresse
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.(com|de|org|net|[a-zA-Z]{2,})$/;
 
+  if( email.value.length > 0){
+
+    if (!emailRegex.test(email.value) ) {
+    emailError.value = "Die E-Mail-Adresse muss auf @gmail mit einer gültigen TLD enden und nur bestimmte Zeichen enthalten.";
+  } else {
+    return email.value;
+    // Weitere Logik hier, z.B. das Absenden des Formulars
+  }
+  }else{
+    emptyEmail.value="Bitte geben Sie Ihre E-Mail-Adresse ein."
+
+  }
+
+  
+}
+
+function validatePassword() {
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}[\]:;"'<>,.?/\\|-]).{8,}$/;
+
+  if ( password.value.length > 0) {
+    if (!passwordRegex.test(password.value)) {
+    passwordError.value = "Das Passwort muss mindestens 8 Zeichen lang sein und mindestens einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.";
+  } else {
+   return password.value;
+  }
+  } else {
+    emptyPasssword.value="Bitte geben Sie Ihr Passwort ein."
+   
+  }
+
+ 
+}
+
+const validateFirstName = () => {
+  if (fname.value.length===0) {
+    fnameError.value = "Bitte geben Sie Ihren Vornamen ein.";
+    
+  } else {
+    return fname.value;
+  }
+};
+
+const validateLastName = () => {
+  if (lastname.value.length===0) {
+    lastnameError.value = "Bitte geben Sie Ihren Nachnamen ein.";
+    
+  } else {
+    return lastname.value;
+  }
+};
 
 async function getUserData(): Promise<string | void> {
     const user = {
-        firstname: fname.value,
-        lastname: lastname.value,
-        email: email.value,
-        password: password.value,
+        firstname: validateFirstName(),
+        lastname: validateLastName(),
+        email: validateEmail(),
+        password: validatePassword(),
     };
 
     try {
@@ -71,6 +137,7 @@ async function getUserData(): Promise<string | void> {
             const errorText = await response.json();
             if(errorText.message==="User already exists"){
               userDupplicate.value=true
+              
               if(userDupplicate.value){
                 emits("userDupplicate", userDupplicate.value)
               
@@ -87,9 +154,16 @@ async function getUserData(): Promise<string | void> {
 
 
     } catch (error) {
-        console.error("Fetch error 2:", error);
+        console.log(error)
     }
 }
+
+function closeError(){
+  userDupplicate.value=false
+ 
+  }
+  
+
 AOS.init({
     duration: 2800,
   })
@@ -103,7 +177,7 @@ AOS.init({
 .form {
   border-radius: 20px;
   box-sizing: border-box;
-  height: 530px;
+  height: 520px;
   padding: 20px;
   margin: 10px 0 10px 0;
   width: 320px;
@@ -120,7 +194,7 @@ AOS.init({
   font-family: sans-serif;
   font-size: 36px;
   font-weight: 600;
-  margin-top: 30px;
+  margin-top: 22px;
 }
 
 .subtitle {
@@ -138,11 +212,11 @@ AOS.init({
 }
 
 .ic1 {
-  margin-top: 40px;
-}
+  margin-top: 35px;
+} 
 
 .ic2 {
-  margin-top: 30px;
+  margin-top: 25px;
 }
 
 .input {
@@ -227,12 +301,36 @@ AOS.init({
 .submit:active {
   background-color: #06b;
 }
-
-.show{
-  visibility: visible;
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
-.hidden{
+.show {
+ visibility: visible;
+  opacity: 1;
+  animation: slideInFromLeft 2.3s ease-in-out;
+}
+.hidden {
   display: none;
 }
+.error {
+  display: flex;
+  justify-content: space-around;
+    background-color: #f44336;
+    color: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    width: 300px;
+  }
+  .multiplication{
+    cursor: pointer;
+  }
 </style>
