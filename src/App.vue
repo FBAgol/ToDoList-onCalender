@@ -18,10 +18,6 @@
       <ToDoList :currentYear="currentYear" :monthName="clickedMonthName"></ToDoList>
     </section>
   </div>
-
-
-
- 
 </template>
 
 
@@ -37,7 +33,7 @@ import { storeToRefs } from 'pinia'
 import AOS from 'aos'
 
 
-
+//const router=useRouter()
 
 const calenderContent=ref(false)
 

@@ -11,27 +11,27 @@
         <div class="cut"></div>
         <label for="firstname" class="placeholder">First name</label>
       </div>
-      <p>{{ fnameError }}</p>
+      <p class="invalidError">{{ fnameError }}</p>
       <div class="input-container ic2">
         <input v-model="lastname" id="lastname" class="input" type="text" placeholder=" " />
         <div class="cut"></div>
         <label for="lastname" class="placeholder">Last name</label>
       </div>
-      <p>{{ lastnameError }}</p>
+      <p class="invalidError">{{ lastnameError }}</p>
       <div class="input-container ic2">
         <input v-model="email" id="email" class="input" type="text" placeholder=" " />
         <div class="cut cut-short"></div>
         <label for="email" class="placeholder">Email</label>
       </div>
-      <p>{{ emailError }}</p>
-      <p>{{ emptyEmail }}</p>
+      <p class="invalidError">{{ emailError }}</p>
+      <p class="invalidError">{{ emptyEmail }}</p>
       <div class="input-container ic2">
         <input v-model="password" id="password" class="input" type="text" placeholder=" " />
         <div class="cut cut-short"></div>
         <label for="password" class="placeholder">Password</label>
       </div>
-      <p>{{ passwordError }}</p>
-      <p>{{ emptyPasssword }}</p>
+      <p class="invalidError">{{ passwordError }}</p>
+      <p class="invalidError">{{ emptyPasssword }}</p>
       <button  class="submit">submit</button>
     </form>
   </div>
@@ -41,7 +41,7 @@
 import { ref, defineEmits} from 'vue';
 import AOS from 'aos'
 
-const emits=defineEmits(["token", "userDupplicate"])
+const emits=defineEmits(["token"])
 const fname = ref<string>("");
 const fnameError=ref<string>("")
 const lastname = ref<string>("");
@@ -52,7 +52,7 @@ const emptyEmail=ref<string>("")
 const password = ref<string>("");
 const passwordError = ref<string | null>(null);
 const emptyPasssword=ref<string>("")
-const errorContent = ref<string>("User already exists. Bitte versuchen Sie mit den anderen Daten");
+const errorContent = ref<string>("* User already exists. Bitte versuchen Sie mit den anderen Daten");
 const userDupplicate=ref(false)
 
 function validateEmail() {
@@ -62,13 +62,13 @@ function validateEmail() {
   if( email.value.length > 0){
 
     if (!emailRegex.test(email.value) ) {
-    emailError.value = "Die E-Mail-Adresse muss auf @gmail mit einer gültigen TLD enden und nur bestimmte Zeichen enthalten.";
+    emailError.value = "* Die E-Mail-Adresse muss auf @gmail mit einer gültigen TLD enden und nur bestimmte Zeichen enthalten.";
   } else {
     return email.value;
     // Weitere Logik hier, z.B. das Absenden des Formulars
   }
   }else{
-    emptyEmail.value="Bitte geben Sie Ihre E-Mail-Adresse ein."
+    emptyEmail.value="* Bitte geben Sie Ihre E-Mail-Adresse ein."
 
   }
 
@@ -80,12 +80,12 @@ function validatePassword() {
 
   if ( password.value.length > 0) {
     if (!passwordRegex.test(password.value)) {
-    passwordError.value = "Das Passwort muss mindestens 8 Zeichen lang sein und mindestens einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.";
+    passwordError.value = "* Das Passwort muss mindestens 8 Zeichen lang sein und mindestens einen Großbuchstaben, eine Zahl und ein Sonderzeichen enthalten.";
   } else {
    return password.value;
   }
   } else {
-    emptyPasssword.value="Bitte geben Sie Ihr Passwort ein."
+    emptyPasssword.value="* Bitte geben Sie Ihr Passwort ein."
    
   }
 
@@ -94,7 +94,7 @@ function validatePassword() {
 
 const validateFirstName = () => {
   if (fname.value.length===0) {
-    fnameError.value = "Bitte geben Sie Ihren Vornamen ein.";
+    fnameError.value = "* Bitte geben Sie Ihren Vornamen ein.";
     
   } else {
     return fname.value;
@@ -103,7 +103,7 @@ const validateFirstName = () => {
 
 const validateLastName = () => {
   if (lastname.value.length===0) {
-    lastnameError.value = "Bitte geben Sie Ihren Nachnamen ein.";
+    lastnameError.value = "* Bitte geben Sie Ihren Nachnamen ein.";
     
   } else {
     return lastname.value;
@@ -121,7 +121,7 @@ async function getUserData(): Promise<string | void> {
     try {
         // in fetch sollen wir nicht "http://localhost:3000/" schrieben das wurde in vue.config.js für Proxy
         // verwendet. das heißt alle fetch api bekommen diese Adresse und wir müssen nur den Endpointname schreiben.
-        const response = await fetch("/user", 
+        const response = await fetch("/user/register", 
             {
                 method: "POST", 
                 //credentials: 'include',
@@ -137,20 +137,15 @@ async function getUserData(): Promise<string | void> {
             const errorText = await response.json();
             if(errorText.message==="User already exists"){
               userDupplicate.value=true
-              
-              if(userDupplicate.value){
-                emits("userDupplicate", userDupplicate.value)
-              
-              }
             }
             
             throw new Error(`Server Error 1: ${errorText.message}`);
         }
 
-        const result = await response.json();
+        const token = await response.json();
+        localStorage.setItem("token", token);
       
-        //console.log(typeof result)
-         emits("token", result)
+         emits("token", token)
 
 
     } catch (error) {
@@ -177,7 +172,7 @@ AOS.init({
 .form {
   border-radius: 20px;
   box-sizing: border-box;
-  height: 520px;
+  min-height: 520px;
   padding: 20px;
   margin: 10px 0 10px 0;
   width: 320px;
@@ -332,5 +327,8 @@ AOS.init({
   }
   .multiplication{
     cursor: pointer;
+  }
+  .invalidError{
+  font-size: 14px;
   }
 </style>

@@ -30,7 +30,6 @@ onMounted(async () => {
 })
 
 const emits = defineEmits(["tok", "isAuth"])
-
 const singInActive = ref(false)
 const landingSeite = ref()
 const isAuthen = ref(true)

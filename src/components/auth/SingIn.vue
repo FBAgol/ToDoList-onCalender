@@ -58,12 +58,14 @@
           const result = await response.json();
           //result has two atrinbuttes isUser and token
           //console.log(result)
-          if (!result) {
+          if (!result.isUser) {
               NotFoundUser.value = true;
               dataAos.value = "fade-up-left";
               AOS.refresh(); // AOS-Animation aktualisieren
               
           } else {
+            console.log(result.token)
+            localStorage.setItem("token", result.token);
             emits("isAuthenticated", result.isUser);
           }
   
