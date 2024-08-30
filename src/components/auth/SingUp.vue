@@ -38,10 +38,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits} from 'vue';
+import { ref} from 'vue';
 import AOS from 'aos'
+import { mainStore } from '@/store/index'
 
-const emits=defineEmits(["token"])
+interface singUpResult{
+  token:string
+  isSingUp:boolean
+}
+
+const store = mainStore()
 const fname = ref<string>("");
 const fnameError=ref<string>("")
 const lastname = ref<string>("");
@@ -54,6 +60,9 @@ const passwordError = ref<string | null>(null);
 const emptyPasssword=ref<string>("")
 const errorContent = ref<string>("* User already exists. Bitte versuchen Sie mit den anderen Daten");
 const userDupplicate=ref(false)
+
+const singUpRes=ref<singUpResult | null>(null)
+
 
 function validateEmail() {
   // Regex für die Gmail-Adresse
@@ -144,8 +153,10 @@ async function getUserData(): Promise<string | void> {
 
         const token = await response.json();
         localStorage.setItem("token", token);
+        singUpRes.value={token:token, isSingUp:true}
+        store.setToken(singUpRes.value)
       
-         emits("token", token)
+
 
 
     } catch (error) {

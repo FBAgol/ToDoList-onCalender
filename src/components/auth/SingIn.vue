@@ -24,11 +24,11 @@
   </template>
   
   <script setup lang="ts">
-  import { ref,defineEmits } from 'vue';
+  import { ref} from 'vue';
+  import { mainStore } from '@/store/index'
   import AOS from 'aos'
   
-  const dataAos=ref<string |null>("")
-  const emits=defineEmits(["isAuthenticated"])
+  const store = mainStore()
   const email = ref<string>("");
   const password = ref<string>("");
   const errorContent = ref<string>("Password or Email is incorrect")
@@ -60,13 +60,11 @@
           //console.log(result)
           if (!result.isUser) {
               NotFoundUser.value = true;
-              dataAos.value = "fade-up-left";
-              AOS.refresh(); // AOS-Animation aktualisieren
               
           } else {
-            console.log(result.token)
+            //console.log(result.token)
             localStorage.setItem("token", result.token);
-            emits("isAuthenticated", result.isUser);
+            store.setToken(result)
           }
   
   

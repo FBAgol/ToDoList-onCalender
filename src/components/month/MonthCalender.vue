@@ -1,34 +1,27 @@
 <template>
-      <h3>Monate vom Jahr : {{ currentYear }}</h3>
+      <h3>Jahr : {{ currentYear }}</h3>
       <div class="">
-        <p ref="monthName" v-for="(month, index) in props.months" :key="index" @click="sendMonthname">
+        <p ref="monthName" v-for="(month, index) in months" :key="index" @click="sendMonthname">
         {{ month.monthName }}
       </p>
       </div>
 </template>
 
 <script setup lang="ts">
-import { ref,defineProps, PropType, defineEmits} from 'vue'
-import {monthAndDay} from '../../types/interfaces'
+import { ref} from 'vue'
 import { mainStore } from '../../store/index'
 import { storeToRefs } from 'pinia'
 
 const store = mainStore()
-const { currentYear } = storeToRefs(store)
+const { currentYear, months } = storeToRefs(store)
 
-const props= defineProps({
-    months: { type: Array as  PropType<monthAndDay[]>, required: true },
-    
-})
 
-const emits=defineEmits(['monthOnClick'])
 const monthName=ref<string>('')
   function sendMonthname(event: MouseEvent) {
   // call the contant of the clicked monthName
   const clickedParagraph = event.target as HTMLParagraphElement;
-  monthName.value = clickedParagraph.textContent || '';
-  //console.log(monthName.value)
-  return emits('monthOnClick', monthName.value)
+  store.indexFirstMonthDay(clickedParagraph.textContent || '')
+  store.clickedMonthName = clickedParagraph.textContent || '';
   
 }
 
@@ -53,7 +46,7 @@ div p {
   text-align: center;
   line-height: 40px;
   border-radius: 5px;
-  background: #bcf7eb;  
+  background-color: #fff;  
 }
 
 div p:hover{

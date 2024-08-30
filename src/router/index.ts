@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import SingIn from '@/components/auth/SingIn.vue'
-import SingUp from '@/components/auth/SingUp.vue'
+import ShowProfil from '@/views/ShowProfil.vue'
+import StimateToDo from '@/views/StimateToDo.vue'
 
 const routes: Array<RouteRecordRaw> = [
    {
@@ -10,16 +10,15 @@ const routes: Array<RouteRecordRaw> = [
     component: HomeView
   },
   {
-    path: '/singin',
-    name: 'singin',
-    component: SingIn
+    path: '/profil',
+    name: 'profil',
+    component: ShowProfil
   },
- 
   {
-    path: '/singup',
-    name: 'singup',
-    component: SingUp
-  },
+    path: '/stimate',
+    name: 'stimate',
+    component: StimateToDo
+  }
  
  
 

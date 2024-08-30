@@ -10,15 +10,14 @@
     </div>
   </div>
   <div class="auth">
-    <singup @token="getToken($event)" :class="singUpActive ? 'show' : 'hidden'">singup</singup> 
-    <singin @is-authenticated="getAuthResult($event)" :class="singInActive ? 'show' : 'hidden'">SingIn</singin>
-  
+    <singup :class="singUpActive ? 'show' : 'hidden'">singup</singup> 
+    <singin :class="singInActive ? 'show' : 'hidden'">SingIn</singin>
   </div>
   
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, defineEmits } from 'vue'
+import { onMounted, ref} from 'vue'
 import AOS from 'aos'
 import singin from './auth/SingIn.vue'
 import singup from './auth/SingUp.vue'
@@ -29,10 +28,9 @@ onMounted(async () => {
   })
 })
 
-const emits = defineEmits(["tok", "isAuth"])
 const singInActive = ref(false)
 const landingSeite = ref()
-const isAuthen = ref(true)
+const singUpActive = ref(false)
 
 function singInContent() {
   singInActive.value = true
@@ -42,28 +40,12 @@ function singInContent() {
   }
 }
 
-const singUpActive = ref(false)
-
 function singUPContent() {
   singUpActive.value = true
   if (singUpActive.value) {
     landingSeite.value.classList.add("hidden")
 
   }
-}
-
-
-function getToken(e: string) {
-  if (e) {
-    return emits("tok", e)
-  }
-}
-
-function getAuthResult(e: boolean) {
-  if (!e) {
-    isAuthen.value = false
-  }
-  return emits("isAuth", e)
 }
 
 </script>
