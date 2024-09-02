@@ -10,13 +10,14 @@
         <hr>
         <div>
             <form action="/action_page.php">
-              <div  v-for="(task, index) in listOfTasks" :key="index">
-                <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
-                <label for="vehicle1">{{ task }}</label><br>
-              </div>    
+              <div v-for="(task, index) in listOfTasks" :key="index">
+                  <input type="checkbox" :id="'task-' + index" v-model="task.completed">
+                  <label :for="'task-' + index">{{ task.text }}</label><br>
+              </div>  
               <button>Speichern</button>
             </form> 
         </div>
+        <button @click="pdfCreater">PDF Creater</button>
 
     </div>
 </template>
@@ -24,21 +25,56 @@
 import {ref } from 'vue';
 import { mainStore } from '@/store/index'
 import { storeToRefs } from 'pinia'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+
 
 const store = mainStore()
 const { clickedDayNumber, currentYear, clickedMonthName } = storeToRefs(store)
 
 const addTask=ref<string>('')
 
-const listOfTasks=ref<string[]>([])
+const listOfTasks=ref<{ text: string, completed: boolean }[]>([])
 
 
-function addTaskToList(){
-  if(addTask.value !== ''){
-    listOfTasks.value.push(addTask.value)
-    addTask.value=''
+function addTaskToList() {
+  if (addTask.value !== '') {
+    listOfTasks.value.push({ text: addTask.value, completed: false });
+    addTask.value = '';
   }
-    
+}
+
+function pdfCreater() {
+  const doc = new jsPDF();
+
+  // Erstelle eine nummerierte Liste der erledigten Aufgaben
+  const completedTasks = listOfTasks.value
+    .filter((task) => task.completed)
+    .map((task, index) => `${index + 1}. ${task.text}`)
+    .join('\n');
+
+  // Erstelle eine nummerierte Liste der nicht erledigten Aufgaben
+  const notCompletedTasks = listOfTasks.value
+    .filter((task) => !task.completed)
+    .map((task, index) => `${index + 1}. ${task.text}`)
+    .join('\n');
+
+  // Generiere die Tabelle für das PDF
+  autoTable(doc, {
+    head: [['Datum', 'Tag', 'Erledigt', 'Nicht Erledigt']],
+    body: [
+      [
+        '1',
+        'Montag',
+        completedTasks || 'Keine erledigten Aufgaben', 
+        notCompletedTasks || 'Alle Aufgaben erledigt',
+      ],
+      // Weitere Zeilen nach Bedarf hinzufügen
+    ],
+  });
+
+  // Speichern der PDF-Datei
+  doc.save('table.pdf');
 }
 
 </script>

@@ -51,7 +51,7 @@ function sendDayNumber(event : MouseEvent){
     /*flex: 1 0 calc(100% / 9);;  5 Divs pro Zeile */
     box-sizing: border-box;
     height: 60px; /* Höhe der Divs */
-    background-color: lightblue;
+    background-color:  #fff;
     border: 1px solid blue;
     border-radius: 50px;
     display: flex;
@@ -79,4 +79,5 @@ function sendDayNumber(event : MouseEvent){
     background-color: aqua;
     cursor: default;
 }
+
 </style>
