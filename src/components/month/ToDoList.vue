@@ -8,16 +8,21 @@
             <button @click="addTaskToList" class="add">Add</button>
         </div>
         <hr>
-        <div>
-            <form action="/action_page.php">
-              <div v-for="(task, index) in listOfTasks" :key="index">
-                  <input type="checkbox" :id="'task-' + index" v-model="task.completed">
-                  <label :for="'task-' + index">{{ task.text }}</label><br>
-              </div>  
-              <button>Speichern</button>
-            </form> 
+        <div class="todos-box">
+          <form @submit.prevent="saveToDos">
+            <div v-for="(task, index) in listOfTasks" :key="index">
+              <div class="todo-label">
+                <div class="left-side">
+                  <input class="largerCheckbox" type="checkbox" :id="'task-' + index" v-model="task.completed">
+                  <label ref="addedTask" :for="'task-' + index">{{ task.text }}</label>
+                </div>
+                <span class="delete-icon" @click="deletTodo(index)">&#128465;</span>
+              </div>
+            </div>
+            <button>Speichern</button>
+          </form>
+          
         </div>
-        <button @click="pdfCreater">PDF Creater</button>
 
     </div>
 </template>
@@ -25,14 +30,14 @@
 import {ref } from 'vue';
 import { mainStore } from '@/store/index'
 import { storeToRefs } from 'pinia'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
+
 
 
 const store = mainStore()
-const { clickedDayNumber, currentYear, clickedMonthName } = storeToRefs(store)
+const { clickedDayNumber, currentYear, clickedMonthName, singInToken, singUpToken } = storeToRefs(store)
 
 const addTask=ref<string>('')
+const addedTask=ref<string>('')
 
 const listOfTasks=ref<{ text: string, completed: boolean }[]>([])
 
@@ -44,38 +49,35 @@ function addTaskToList() {
   }
 }
 
-function pdfCreater() {
-  const doc = new jsPDF();
 
-  // Erstelle eine nummerierte Liste der erledigten Aufgaben
-  const completedTasks = listOfTasks.value
-    .filter((task) => task.completed)
-    .map((task, index) => `${index + 1}. ${task.text}`)
-    .join('\n');
-
-  // Erstelle eine nummerierte Liste der nicht erledigten Aufgaben
-  const notCompletedTasks = listOfTasks.value
-    .filter((task) => !task.completed)
-    .map((task, index) => `${index + 1}. ${task.text}`)
-    .join('\n');
-
-  // Generiere die Tabelle für das PDF
-  autoTable(doc, {
-    head: [['Datum', 'Tag', 'Erledigt', 'Nicht Erledigt']],
-    body: [
-      [
-        '1',
-        'Montag',
-        completedTasks || 'Keine erledigten Aufgaben', 
-        notCompletedTasks || 'Alle Aufgaben erledigt',
-      ],
-      // Weitere Zeilen nach Bedarf hinzufügen
-    ],
+async function saveToDos() {
+  const bodyTodo={
+    token: singInToken.value?.token || singUpToken.value?.token,
+    todo: {
+      done: listOfTasks.value.filter((task) => task.completed).map((task) => task.text),
+      notDone: listOfTasks.value.filter((task) => !task.completed).map((task) => task.text)  
+    }
+  }
+  const response= await fetch('/todo/addTodo', {
+    method: 'POST',
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(bodyTodo),
   });
-
-  // Speichern der PDF-Datei
-  doc.save('table.pdf');
+ 
+  if (!response.ok) {
+    throw new Error(`Server Error: ${response.statusText}`);
+  }
 }
+
+function deletTodo(index: number) {
+  const taskToDelete = listOfTasks.value[index];
+  listOfTasks.value.splice(index, 1);
+
+}
+
 
 </script>
 <style scoped>
@@ -88,8 +90,8 @@ hr{
 .input-container {
   height: 34px;
   position: relative;
-  width: 100%;
-  margin: 5px;
+  width: 98%;
+  /*margin: 5px; */
 }
 
 .input {
@@ -168,5 +170,45 @@ hr{
   color: #dc2f55;
 }
 
+.todos-box {
+  width: 98%;
+  margin: 5px;
+  display: relative;
+}
+
+.todo-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 5px;
+  margin: 2px;
+  height: 18px;
+  
+}
+
+.left-side {
+  display: flex;
+  align-items: center;
+}
+
+input.largerCheckbox {
+  width: 17px;
+  height: 17px;
+  margin-right: 10px; /* Adds space between checkbox and label */
+}
+
+.delete-icon {
+  cursor: pointer;
+  font-size: 20px;
+  padding-left: 10px;
+  transition: transform 0.2s ease; /* Smooth transition for hover effect */
+}
+
+.delete-icon:hover {
+  color: red;
+  transform: scale(1.5); /* Increases the size of the icon without affecting layout */
+}
 
 </style>

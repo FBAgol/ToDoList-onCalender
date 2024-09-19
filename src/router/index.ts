@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ShowProfil from '@/views/ShowProfil.vue'
-import StimateToDo from '@/views/StimateToDo.vue'
+import CreatePDF from '@/views/CreatePDF.vue'
 
 const routes: Array<RouteRecordRaw> = [
    {
@@ -15,9 +15,9 @@ const routes: Array<RouteRecordRaw> = [
     component: ShowProfil
   },
   {
-    path: '/stimate',
-    name: 'stimate',
-    component: StimateToDo
+    path: '/createpdf',
+    name: 'creaepdf',
+    component: CreatePDF
   }
  
  

@@ -6,7 +6,7 @@
     <nav class="navigation">
       <RouterLink class="router" to="/">Home</RouterLink>
       <RouterLink class="router" to="/profil">Profile</RouterLink>
-      <RouterLink  class="router" to="/stimate">Stimate</RouterLink>
+      <RouterLink  class="router" to="/createpdf">PDF Export</RouterLink>
    </nav>
    <RouterView></RouterView>
   </div>
