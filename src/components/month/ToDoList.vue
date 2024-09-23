@@ -20,26 +20,24 @@
               </div>
             </div>
             <button>Speichern</button>
-          </form>
-          
+          </form>  
         </div>
-
     </div>
 </template>
 <script setup lang="ts">
-import {ref } from 'vue';
+import {ref, watch } from 'vue';
 import { mainStore } from '@/store/index'
 import { storeToRefs } from 'pinia'
-
-
+import { TodoBody, TaskRequestBody  } from '@/types/todoInterfaces';
 
 const store = mainStore()
 const { clickedDayNumber, currentYear, clickedMonthName, singInToken, singUpToken } = storeToRefs(store)
 
 const addTask=ref<string>('')
 const addedTask=ref<string>('')
-
 const listOfTasks=ref<{ text: string, completed: boolean }[]>([])
+const availableTodos= ref(true)
+const allOfMonth = ['Janur', 'Februar', 'März', 'Apri', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
 
 
 function addTaskToList() {
@@ -49,6 +47,96 @@ function addTaskToList() {
   }
 }
 
+watch([clickedDayNumber, clickedMonthName,], ([newDayNumber, newMonthName]) => {
+  if(newDayNumber && newMonthName){
+    getAvailableTodos()
+  }
+})
+
+
+async function getAvailableTodos() {
+  if(allOfMonth.findIndex(month=> month===clickedMonthName.value) <10){
+    const selectedDate= `${currentYear.value}-0${allOfMonth.findIndex(month=> month===clickedMonthName.value)+1}-${clickedDayNumber.value}`
+    const token= singInToken.value?.token || singUpToken.value?.token
+    const response= await  fetch(`/getTodo/${selectedDate}`, {
+      method: 'GET',
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        'Authorization': `Bearer ${token}`}})
+
+        if (!response.ok) {
+          throw new Error(`Server Error: ${response.statusText}`);
+        }
+        const data= await response.json()
+        if(data==='No Result Found'){
+          listOfTasks.value=[]
+          availableTodos.value=false
+          return
+        }else{          
+          listOfTasks.value= JSON.parse(data).done
+            .map((task: string) => ({ text: task, completed: true }))
+            .concat(JSON.parse(data).notDone.map((task: string) => ({ text: task, completed: false })))
+        }      
+  }
+  else{
+    const selectedDate= `${currentYear.value}-${allOfMonth.findIndex(month=> month===clickedMonthName.value)+1}-${clickedDayNumber.value}`
+    const token= singInToken.value?.token || singUpToken.value?.token
+    const response= await  fetch(`/getTodo/${selectedDate}`, {
+      method: 'GET',
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        'Authorization': `Bearer ${token}`}})
+
+        if (!response.ok) {
+          throw new Error(`Server Error: ${response.statusText}`);
+        }
+        const data= await response.json()
+        if(data==='No Result Found'){
+          listOfTasks.value=[]
+          availableTodos.value=false
+          return
+        }else{
+          listOfTasks.value= JSON.parse(data).done
+            .map((task: string) => ({ text: task, completed: true }))
+            .concat(JSON.parse(data).notDone.map((task: string) => ({ text: task, completed: false })))
+        }
+    }
+}
+
+async function saveTask(date:string, body:TaskRequestBody) {
+  const response= await fetch(`/todo/addTodo/${date}`, {
+    method: 'POST',
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body),
+    });
+ 
+    if (!response.ok) {
+      throw new Error(`Server Error: ${response.statusText}`);
+    }
+}
+
+async function update(date:string,token:string | undefined, todo:TodoBody) {
+  const body = {
+    todo: { 
+      done: todo.done, 
+      notDone: todo.notDone 
+    }
+  };
+  const response= await  fetch(`/update/${date}`, {
+        method: 'PATCH',
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json"},
+          body: JSON.stringify(body)})
+
+        if (!response.ok) {
+          throw new Error(`Server Error: ${response.statusText}`);
+        }  
+}
 
 async function saveToDos() {
   const bodyTodo={
@@ -58,27 +146,39 @@ async function saveToDos() {
       notDone: listOfTasks.value.filter((task) => !task.completed).map((task) => task.text)  
     }
   }
-  const response= await fetch('/todo/addTodo', {
-    method: 'POST',
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(bodyTodo),
-  });
- 
-  if (!response.ok) {
-    throw new Error(`Server Error: ${response.statusText}`);
+
+  if(availableTodos.value===false){
+    if(allOfMonth.findIndex(month=> month===clickedMonthName.value) <10){
+      const selectedDate= `${currentYear.value}-0${allOfMonth.findIndex(month=> month===clickedMonthName.value)+1}-${clickedDayNumber.value}`
+      saveTask(selectedDate, bodyTodo)
+    }
+    else{
+      const selectedDate= `${currentYear.value}-${allOfMonth.findIndex(month=> month===clickedMonthName.value)+1}-${clickedDayNumber.value}`
+      saveTask(selectedDate, bodyTodo)
+    } 
+  }
+  else{
+    const todo= { 
+      done: listOfTasks.value.filter((task) => task.completed).map((task) => task.text),
+      notDone: listOfTasks.value.filter((task) => !task.completed).map((task) => task.text) 
+    }
+    if(allOfMonth.findIndex(month=> month===clickedMonthName.value) <10){
+      const selectedDate= `${currentYear.value}-0${allOfMonth.findIndex(month=> month===clickedMonthName.value)+1}-${clickedDayNumber.value}`
+      const token= singInToken.value?.token || singUpToken.value?.token
+      update(selectedDate, token, todo)
+    }
+    else{
+      const selectedDate= `${currentYear.value}-${allOfMonth.findIndex(month=> month===clickedMonthName.value)+1}-${clickedDayNumber.value}`
+      const token= singInToken.value?.token || singUpToken.value?.token
+      update(selectedDate, token, todo)
+    }
   }
 }
 
 function deletTodo(index: number) {
   const taskToDelete = listOfTasks.value[index];
   listOfTasks.value.splice(index, 1);
-
 }
-
-
 </script>
 <style scoped>
 .dateTitle{

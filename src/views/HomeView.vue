@@ -22,11 +22,13 @@ import AOS from 'aos'
 
 const store = mainStore()
 
-onMounted(async()=>{
-  store.monthInfo(), 
-  AOS.init()
-
-})
+onMounted(async () => {
+  // Überprüfe, ob die Monate schon geladen sind, um doppelte Aufrufe zu vermeiden
+  if (!store.months || store.months.length === 0) {
+    store.monthInfo(); 
+  }
+  AOS.init();
+});
 
 </script>
 
